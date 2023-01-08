@@ -1,11 +1,13 @@
 from flask import Flask
-import os
 from flask import request, jsonify
 from crypter import Crypterast
+from random import choice
+from db import DB
+import os
 
 
 app = Flask(__name__)
-
+db = DB()
 cr = Crypterast()
 
 
@@ -14,18 +16,23 @@ def home():
     return 'You are at home page.'
 
 
-@app.route('/j!u5xfwd22-w8**8bppt8vm3$86&-50y^hkw1qty')
-def l():
-    return 'lll'
-
-
 @app.route("/get", methods=['POST'])  # создание нового ивента
-def events_create():
+def gettok():
     if request.method == "POST":
         key = request.form['pubkey']
-        with open('README.md', 'rb') as f:
-            data = f.read()
-        t = cr.import_key(key, data)  # .decode('utf8')
+        db = DB()
+        for files in os.listdir('config'):
+            try:
+                db.write('config_list','name', f"'{files}'")
+            except:
+                pass
+        lst = db.read('config_list WHERE life = 0', 'name')
+        print(lst)
+        free_token = choice([i[0] for i in lst])
+        db.update('config_list', 'life = True', f"name = '{free_token}'")
+        with open('config/'+free_token, 'rb') as dt:
+            data = dt.read()
+        t = cr.import_key(key, data)#.decode('utf8')
         return t
 
 
@@ -33,4 +40,4 @@ def events_create():
 if __name__ == '__main__':
     # run() method of Flask class runs the application
     # on the local development server.
-    app.run(debug=True)
+    app.run(host='0.0.0.0',port=9525)

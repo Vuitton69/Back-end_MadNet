@@ -1,6 +1,6 @@
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
-from base64 import b64decode, b64encode
+from base64 import b64decode
 
 
 class Crypterast:
@@ -34,12 +34,6 @@ class Crypterast:
 
     def decrypt(self, text: bytes):
         return self._decryptor.decrypt(text)
-
-    def upload(self):
-        pass
-
-    def put_config(self):
-        pass
 
 
 if __name__ == '__main__':

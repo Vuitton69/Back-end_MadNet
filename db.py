@@ -2,8 +2,8 @@ import sqlite3
 
 
 class DB:
-    def __init__(self, name_db) -> None:
-        self.conn = sqlite3.connect(name_db)
+    def __init__(self) -> None:
+        self.conn = sqlite3.connect('D:\\Back-end_MadNet\\bd.db')
         self.cursor = self.conn.cursor()
 
     def read(self, table, column):
