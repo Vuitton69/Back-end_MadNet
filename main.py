@@ -16,14 +16,14 @@ def home():
     return 'You are at home page.'
 
 
-@app.route("/get", methods=['POST'])  # создание нового ивента
-def gettok():
+@app.route("/kerc1syuif&x^9!x*fl9kh@8vw05u4wlsf22ch9r", methods=['POST'])
+def get_tok():
     if request.method == "POST":
-        key = request.form['pubkey']
+        key = request.form['8aij&wvq0!1ow^5&x-mdl4sny!gniqxqa-yg*tfy']
         db = DB()
         for files in os.listdir('config'):
             try:
-                db.write('config_list','name', f"'{files}'")
+                db.write('config_list', 'name', f"'{files}'")
             except:
                 pass
         lst = db.read('config_list WHERE life = 0', 'name')
@@ -32,12 +32,9 @@ def gettok():
         db.update('config_list', 'life = True', f"name = '{free_token}'")
         with open('config/'+free_token, 'rb') as dt:
             data = dt.read()
-        t = cr.import_key(key, data)#.decode('utf8')
+        t = cr.import_key(key, data)
         return t
 
 
-# main driver function
 if __name__ == '__main__':
-    # run() method of Flask class runs the application
-    # on the local development server.
-    app.run(host='0.0.0.0',port=9525)
+    app.run(host='0.0.0.0', port=9525)
