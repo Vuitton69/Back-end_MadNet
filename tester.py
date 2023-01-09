@@ -43,7 +43,8 @@ def download_config():
     pub = cr.public_key_final
     get = 'kerc1syuif&x^9!x*fl9kh@8vw05u4wlsf22ch9r'
     pkey = '8aij&wvq0!1ow^5&x-mdl4sny!gniqxqa-yg*tfy'
-    link = 'http://127.0.0.1:9525/'+get
+    link = 'http://10.0.0.2:9525/'+get
+    print(requests.get('http://10.0.0.2:9525/').status_code)
     p = requests.post(link, data={pkey: cr.public_key_final}).content
     with open('configer', 'w') as f:
         f.write(cr.decrypt(p).decode())
