@@ -37,4 +37,4 @@ def get_tok():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=9525)
+    app.run(host='0.0.0.0', port=9566)
