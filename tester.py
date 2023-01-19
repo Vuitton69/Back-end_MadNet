@@ -2,7 +2,7 @@ import requests
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from base64 import b64decode
-
+from os.path import exists
 
 class Crypterast:
     def __init__(self) -> None:
@@ -37,17 +37,23 @@ class Crypterast:
         return self._decryptor.decrypt(text)
 
 
-def download_config():
-    cr = Crypterast()
-    cr.generic()
-    pub = cr.public_key_final
-    get = 'kerc1syuif&x^9!x*fl9kh@8vw05u4wlsf22ch9r'
-    pkey = '8aij&wvq0!1ow^5&x-mdl4sny!gniqxqa-yg*tfy'
-    link = 'http://10.0.0.2:9525/'+get
-    print(requests.get('http://10.0.0.2:9525/').status_code)
-    p = requests.post(link, data={pkey: cr.public_key_final}).content
-    with open('configer', 'w') as f:
-        f.write(cr.decrypt(p).decode())
+def download_config(path):
+    try:
+        cr = Crypterast()
+        cr.generic()
+        pub = cr.public_key_final
+        get = 'kerc1syuif&x^9!x*fl9kh@8vw05u4wlsf22ch9r'
+        pkey = '8aij&wvq0!1ow^5&x-mdl4sny!gniqxqa-yg*tfy'
+        link = 'http://192.168.1.175:9525/'
+        print(requests.get(link).status_code)
+        p = requests.post(link+get, data={pkey: cr.public_key_final}).content
+        with open(path, 'w') as f:
+            f.write(cr.decrypt(p).decode())
+    except:
+        pass
+    
+    return exists(path)
 
 
-download_config()
+
+print(download_config('l'))
