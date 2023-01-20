@@ -3,7 +3,7 @@ import sqlite3
 
 class DB:
     def __init__(self) -> None:
-        self.conn = sqlite3.connect('/root/Back-end_MadNet/bd.db')
+        self.conn = sqlite3.connect('D:\\Back-end_MadNet\\bd.db', check_same_thread=False)
         self.cursor = self.conn.cursor()
 
     def read(self, table, column):
@@ -22,5 +22,5 @@ class DB:
         self.cursor.execute(f"DELETE FROM {table}  WHERE {column} = '{values}'")
         return True
 
-    def kill(self):
+    def close(self):
         self.conn.close()

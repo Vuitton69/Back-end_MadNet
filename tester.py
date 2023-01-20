@@ -3,6 +3,9 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from base64 import b64decode
 from os.path import exists
+from db import DB
+
+db = DB()
 
 class Crypterast:
     def __init__(self) -> None:
@@ -44,16 +47,36 @@ def download_config(path):
         pub = cr.public_key_final
         get = 'kerc1syuif&x^9!x*fl9kh@8vw05u4wlsf22ch9r'
         pkey = '8aij&wvq0!1ow^5&x-mdl4sny!gniqxqa-yg*tfy'
-        link = 'http://192.168.1.175:9525/'
+        link = 'http://192.168.1.175:9566/'
         print(requests.get(link).status_code)
         p = requests.post(link+get, data={pkey: cr.public_key_final}).content
         with open(path, 'w') as f:
             f.write(cr.decrypt(p).decode())
     except:
         pass
-    
+
     return exists(path)
 
 
+class Pusher:
+    def __init__(self) -> None:
+        pass
 
-print(download_config('l'))
+    def hendler(self, text):
+        text = text.split('{')
+        self.name, self.command = text[0].split()
+        self.args = ','.join([i.split('}')[0] for i in text[1:]])
+
+    def push_data(self, text):
+        self.hendler(text)
+        data = f'{self.command},{self.args}'
+        db.write('events', '`name`,`command`', f"'{self.name}','{data}'")
+        print(data)
+
+
+# pusher = Pusher()
+# pusher.push_data('pc9 cmdo {ms} {paint}')
+link = 'http://192.168.1.175:9566/get/new'
+print(requests.get(link).json())
+# # print(download_config('l'))
+# print(requests.post(link, data={'token': '1w78p8v15cp6'}).json())

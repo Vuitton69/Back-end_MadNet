@@ -1,42 +1,23 @@
 from random import choice
-from db import DB
-import os
+import hashlib
 
 
+def hash_password(password):
+    hash_object = hashlib.sha1(password.encode())
+    hash = hash_object.hexdigest()
+    return hash
 
 
-# print(db.read('links', '*'))
-# print(db.delete('links', 'id', '1'))
-
-# print(db.read('links', '*'))
+def check_password(hashed_password, user_password):
+    return hashed_password == hash_password(user_password)
 
 
-# for i in range(10):
-#     t = generate_token()
-#     print(t)
+GEN_CONST = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+                          'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+len_no_hash_token = 12
 
-class Getter:
-    def __init__(self) -> None:
-        self.db = DB()
-    def read_file(self):
-        for files in os.listdir('config'):
-            try:
-                self.db.write('config_list','name', f"'{files}'")
-            except:
-                pass
-    def get_token(self):
-        lst = self.db.read('config_list WHERE life = 0', 'name')
-        print(lst)
-        free_token = choice([i[0] for i in lst])
-        self.db.update('config_list', 'life = True', f"name = '{free_token}'")
-        with open('config/'+free_token, 'rb') as dt:
-            data = dt.read()
-        return data
-
-# gt = Getter()
-# print(gt.get_token())
-# for i in range(10):
-#     with open(f'config/config{i}', 'w') as f:
-#         f.write(f'pc{i} {i} [123,321] 0 0')
-
-# conn.commit()
+def generate_token():
+    new_token = ""
+    for _ in range(len_no_hash_token):
+        new_token += choice(GEN_CONST)
+    return new_token

