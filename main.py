@@ -50,6 +50,22 @@ def get_tokdeed(pc):
             return {'token': com}
 
         return {'token': False}
+
+
+@app.route("/push/<pc>", methods=['POST'])
+def getyu(pc):
+    if request.method == "POST":
+        token = request.form['token']
+        htoken = db.read(f"config_list WHERE name = '{pc}'", 'token')[0][0]
+
+        if md.check_password(htoken, token):
+            answer = request.form['answer'] # [id, output_command]
+            md.send_message(answer[1])
+            com = db.delete('events', 'id' f"'{answer[0]}'")
+            
+            return {'token': True}
+
+        return {'token': False}
         
 
 

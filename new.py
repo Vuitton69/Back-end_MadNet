@@ -1,9 +1,8 @@
-from db import DB
-from time import sleep
+import requests
 
-db = DB()
-for i in range(3,100):
-    db.write('config_list', '`name`,`token`', f"'pc{i}','hash_token'")
+def send_message(text):
+    url = f"https://api.telegram.org/bot5707775054:AAGlgA-3myDirI9vyxclNPUqzM4-j1zR6Ts/sendMessage"
+    response = requests.post(url, data={'chat_id': -607433374, 'text': text})
+    return response.json()['ok']
 
-    sleep(0.5)
-db.close()
+send_message('dd')

