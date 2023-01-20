@@ -2,15 +2,13 @@ from flask import Flask
 from flask import request, jsonify
 from db import DB
 import midlware as md
-import new
-import bots
 
 app = Flask(__name__)
 db = DB()
 
+bot = db.read('config_list', 'name')
+bots = sorted([i[0] for i in bot])
 
-lst = db.read(f"config_list WHERE name = 'pc0'", 'token')
-print(lst)
     
 @app.route('/')
 def home():
@@ -42,11 +40,14 @@ def find_question(question):
 def get_tokdeed(pc):
     if request.method == "POST":
         token = request.form['token']
-        lst = db.read(f"events WHERE name = '{pc}'", 'command')
-        if md.check_password(lst, token):
-            command = request.form['command']
-            # with open('new.py','a') as f:
-            #     f.write('\na = 3')
+        htoken = db.read(f"config_list WHERE name = '{pc}'", 'token')[0][0]
+
+        if md.check_password(htoken, token):
+            com = db.read(f"events WHERE name = '{pc}' and answer = false", 'id, command')
+            
+            com = sorted([list(i) for i in com])
+            print(com)
+            return {'token': com}
 
         return {'token': False}
         

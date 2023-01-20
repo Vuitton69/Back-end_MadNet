@@ -58,25 +58,22 @@ def download_config(path):
     return exists(path)
 
 
-class Pusher:
-    def __init__(self) -> None:
-        pass
+def push_data(text):
+    text = text.split('{')
+    name, command = text[0].split()
+    args = ','.join([i.split('}')[0] for i in text[1:]])
 
-    def hendler(self, text):
-        text = text.split('{')
-        self.name, self.command = text[0].split()
-        self.args = ','.join([i.split('}')[0] for i in text[1:]])
-
-    def push_data(self, text):
-        self.hendler(text)
-        data = f'{self.command},{self.args}'
-        db.write('events', '`name`,`command`', f"'{self.name}','{data}'")
-        print(data)
+    data = f'{command},{args}'
+    db.write('events', '`name`,`command`', f"'{name}','{data}'")
+    print(data.split(','))
 
 
-# pusher = Pusher()
-# pusher.push_data('pc9 cmdo {ms} {paint}')
-link = 'http://192.168.1.175:9566/get/new'
-print(requests.get(link).json())
-# # print(download_config('l'))
-# print(requests.post(link, data={'token': '1w78p8v15cp6'}).json())
+push_data('pc0 cmdo {python --version}')
+
+def poling():
+    link = f'http://192.168.1.175:9566/pull/pc0'
+    # print(requests.get(link).json())
+    # # print(download_config('l'))
+    print(requests.post(link, data={'token': 'nvw2ztjjv9y5'}).json())
+
+
