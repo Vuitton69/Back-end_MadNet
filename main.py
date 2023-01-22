@@ -71,6 +71,20 @@ def push_text(pc):
         except:
             return {'token': False}
 
+@app.route("/online/<pc>", methods=['POST'])
+def push_text(pc):
+    if request.method == "POST":
+        try:
+            token = request.form['token']
+            htoken = db.read(f"config_list WHERE name = '{pc}'", 'token')[0][0]
+
+            if md.check_password(htoken, token):
+                answer = request.form['answer'] 
+                md.send_message(answer)
+
+                return {'token': True}
+        except:
+            return {'token': False}
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9566, debug=True)
